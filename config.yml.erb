@@ -247,6 +247,12 @@ aws_region: us-east-1
 aws_access_key:
 aws_secret_key:
 
+# CSTA's enrollment form, which we push submissions to as part of our AFE partnership.
+# We're treating the form id as a secret because with it, the public form URL is
+# guessable, and CSTA may not wish to make it public.
+csta_jotform_api_key: !Secret
+csta_jotform_form_id: !Secret
+
 ### Service configurations (urls, endpoints, etc)
 
 freegeoip_host:
