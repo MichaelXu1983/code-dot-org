@@ -9,8 +9,8 @@ module Pd
     class JotFormRestClient
       API_ENDPOINT = 'http://api.jotform.com/'.freeze
 
-      def initialize
-        @api_key = CDO.jotform_api_key
+      def initialize(api_key = CDO.jotform_api_key)
+        @api_key = api_key
         raise KeyError, 'Unable to find configuration entry jotform_api_key' unless @api_key
 
         @resource = RestClient::Resource.new(
@@ -61,6 +61,26 @@ module Pd
       # @param submission_id [Integer]
       def get_submission(submission_id)
         get "submission/#{submission_id}"
+      end
+
+      # Generate a new form submission using
+      # POST /form/:id/submissions
+      # See: https://api.jotform.com/docs/#post-form-id-submissions
+      def add_submission_to_form(form_id, answers)
+        path_with_params = "form/#{form_id}/submissions?#{default_params.to_query}"
+        # Payload should be in the form
+        # submissions[2]=value&submissions[3]=value
+        payload = answers.
+          map {|k, v| "submission[#{k}]=#{URI.encode_www_form_component v}"}.
+          join('&')
+
+        response = @resource[path_with_params].post(
+          payload,
+          {
+            'Content-Type': 'x-www-form-urlencoded'
+          }
+        )
+        JSON.parse response.body
       end
 
       private
